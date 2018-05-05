@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'leiningen' 
-            args '-v /srv/docker/var/m2:/root/.m2 --dns=10.1.0.1'
+            args '-v /srv/docker/var/m2:/root/.m2'
         }
     }
     stages {
