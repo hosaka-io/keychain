@@ -16,8 +16,8 @@ pipeline {
             agent any
             steps {
                 script {
-                    withDockerServer(){
-                    withDockerRegistry('https://registry.i.hosaka.io') {
+                    docker.withServer(){
+                    docker.withRegistry('https://registry.i.hosaka.io') {
                         def app = docker.build("registry.i.hosaka.io/keychain")
                         app.push("${env.BUILD_NUMBER}")
                     }}
