@@ -1,18 +1,19 @@
 pipeline {
-
-    agent {
-        docker {
-            image 'leiningen' 
-            args '-v /srv/docker/var/m2:/root/.m2'
-        }
-    }
+    agent none
     stages {
         stage('Build JAR') { 
+           agent {
+                docker {
+                    image 'leiningen' 
+                    args '-v /srv/docker/var/m2:/root/.m2'
+                }
+            }
             steps {
                 sh 'lein do clean, uberjar'
             }
         }
         stage('Build image') {
+            agent any
             steps {
                 script {
                     withDockerServer(){
