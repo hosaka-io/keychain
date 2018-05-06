@@ -14,13 +14,11 @@ pipeline {
         }
         stage('Build image') {
             steps {
-                def app = docker.build("registry.i.hosaka.io/keychain")
-            }
-        }
-        stage('Push image') {
-            steps {
-                docker.withRegistry('https://registry.i.hosaka.io') {
-                    app.push("${env.BUILD_NUMBER}")
+                script {
+                    def app = docker.build("registry.i.hosaka.io/keychain")
+                    docker.withRegistry('https://registry.i.hosaka.io') {
+                        app.push("${env.BUILD_NUMBER}")
+                    }
                 }
             }
         }
