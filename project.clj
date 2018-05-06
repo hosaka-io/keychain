@@ -40,6 +40,7 @@
 
                  [com.novemberain/langohr "5.0.0"]
                  ]
+  :uberjar-name "keychain.jar"
   :main ^:skip-aot io.hosaka.keychain
   :target-path "target/%s"
   :source-paths ["src"]
