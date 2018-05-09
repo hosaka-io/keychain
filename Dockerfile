@@ -4,4 +4,4 @@ WORKDIR /srv
 
 EXPOSE 8080
 
-ENTRYPOINT /usr/bin/java -Dconfig==`ls /run/secrets/*keychain_secret.edn` -jar /srv/keychain.jar
+ENTRYPOINT /usr/bin/java -Dconfig=`ls /run/secrets/*keychain_secret.edn` -jar /srv/keychain.jar
