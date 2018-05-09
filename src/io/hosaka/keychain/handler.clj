@@ -15,6 +15,13 @@
    (d/chain #(assoc response :body (json/generate-string %) :status 200 :headers {"content-type" "application/json"}))
    (d/catch #(assoc response :body (.getMessage %) :status 400 :headers {"content-type" "text/plain"}))))
 
+(defn get-db-health [orchestrator {:keys [response]}]
+  (->
+   (orchestrator/get-db-health orchestrator)
+   (d/chain #(if (= (:health %1) "HEALTHY")
+               (assoc response :body %1 :status 200)
+               (assoc response :body %1 :status 503)))))
+
 (defn build-routes [orchestrator]
   ["/" [
         ["keys/"
@@ -25,13 +32,9 @@
                          :methods {
                                    :get {:response (partial get-public-key orchestrator)
                                          :produces "text/plain"}}})]
-        (comment
-          ["hello" (yada/handler "Hello World!\n")]
-          ["echo" (yada/resource {:methods
-                                  {:get {:produces "text/plain"
-                                         :response (fn [ctx]
-                                                     (clojure.pprint/pprint ctx)
-                                                     "Hi there")}}})])
+        ["health"
+         (yada/resource {:methods {:get {:response (partial get-db-health orchestrator)
+                                         :produces "application/json"}}})]
         ]])
 
 
