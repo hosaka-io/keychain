@@ -8,7 +8,7 @@
         "appenders": {
             "Console": {
                 "name": "STDOUT",
-                "JSONLayout" : {"compact":true}
+                "JSONLayout" : {"compact":true, "eventEol": true}
             }
         },
         "loggers": {
