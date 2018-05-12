@@ -26,7 +26,7 @@
     (reset! system (init-system env))
 
     (swap! system component/start)
-    (log/info "Keychain booted")
+    (log/info "Keychain service booted")
     (deref semaphore)
     (log/info "keychain going down")
     (component/stop @system)
