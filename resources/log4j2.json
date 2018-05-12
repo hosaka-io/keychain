@@ -8,9 +8,7 @@
         "appenders": {
             "Console": {
                 "name": "STDOUT",
-                "PatternLayout": {
-                    "pattern": "%d [%t] %-5p %c - %m%n"
-                }
+                "JSONLayout" : {}
             }
         },
         "loggers": {
