@@ -1,6 +1,6 @@
 (ns io.hosaka.keychain.db.keys
   (:require [manifold.deferred :as d]
-            [io.hosaka.keychain.db :refer [get-connection def-db-fns]]))
+            [io.hosaka.common.db :refer [get-connection def-db-fns]]))
 
 (def-db-fns "db/sql/keys.sql")
 
