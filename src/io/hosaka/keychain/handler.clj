@@ -1,6 +1,7 @@
 (ns io.hosaka.keychain.handler
   (:require [com.stuartsierra.component :as component]
             [io.hosaka.keychain.orchestrator :as orchestrator]
+            [clojure.tools.logging :as log]
             [io.hosaka.common.db.health :as health]
             [cheshire.core :as json]
             [manifold.deferred :as d]
@@ -14,7 +15,9 @@
   (->
    (orchestrator/validate-token orchestrator body)
    (d/chain #(assoc response :body (json/generate-string %) :status 200 :headers {"content-type" "application/json"}))
-   (d/catch #(assoc response :body (.getMessage %) :status 400 :headers {"content-type" "text/plain"}))))
+   (d/catch #(let [msg (.getMessage %)]
+               (log/warn (str "Invalid token: " msg))
+               (assoc response :body msg :status 400 :headers {"content-type" "text/plain"})))))
 
 
 (defn get-db-health [health {:keys [response]}]
