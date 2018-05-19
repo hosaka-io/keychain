@@ -1,6 +1,5 @@
 (ns io.hosaka.keychain.orchestrator
   (:require [io.hosaka.keychain.keys :as keys]
-            [io.hosaka.common.db.health :as health]
             [buddy.sign.jwt :as jwt]
             [manifold.deferred :as d]
             [cheshire.core :as json]
@@ -22,15 +21,6 @@
   (component/using
    (map->Orchestrator {})
    [:keys :db]))
-
-(defn get-db-health [{:keys [db]}]
-  (-> (health/get-db-health db)
-      (d/chain #(if (or
-                     (nil? %1)
-                     (empty? %1))
-                  {:health "UNHEALTHY"}
-                  {:health "HEALTHY" :db %1}))
-      (d/catch (fn [e] {:health "UNHEALTHY" :db (.getMessage e)}))))
 
 (defn key-to-pem [{:keys [key_data]}]
   (str "-----BEGIN PUBLIC KEY-----\n"

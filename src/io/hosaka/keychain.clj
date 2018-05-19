@@ -3,10 +3,11 @@
             [com.stuartsierra.component :as component]
             [manifold.deferred :as d]
             [clojure.tools.logging :as log]
-            [io.hosaka.keychain.db :refer [new-database]]
             [io.hosaka.keychain.handler :refer [new-handler]]
             [io.hosaka.keychain.keys :refer [new-keys]]
             [io.hosaka.keychain.orchestrator :refer [new-orchestrator]]
+            [io.hosaka.common.db :refer [new-database]]
+            [io.hosaka.common.db.health :refer [new-health]]
             [io.hosaka.common.server :refer [new-server]]
             )
   (:gen-class))
@@ -17,7 +18,8 @@
   (component/system-map
    :keys (new-keys)
    :handler (new-handler)
-   :db (new-database env)
+   :health (new-health env)
+   :db (new-database "keychain" env)
    :orchestrator (new-orchestrator)
    :server (new-server env)))
 
