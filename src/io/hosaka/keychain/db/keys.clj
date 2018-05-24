@@ -8,5 +8,3 @@
   (d/future
     (get-key-sql (get-connection db) {:kid kid})))
 
-
-

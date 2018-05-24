@@ -1,6 +1,7 @@
 (ns io.hosaka.keychain.orchestrator
   (:require [io.hosaka.keychain.keys :as keys]
             [buddy.sign.jwt :as jwt]
+            [buddy.sign.jws :refer [decode-header]]
             [manifold.deferred :as d]
             [cheshire.core :as json]
             [clj-crypto.core :as crypto]
@@ -44,23 +45,33 @@
     (String. b)
     nil))
 
-(defn get-kid [token]
-  (-> token
-      (split #"\.")
-      first
-      crypto/decode-base64
-      bytes->string
-      (json/parse-string true)
-      :kid))
+(defn get-kid [jwt]
+  (->
+   jwt
+   decode-header
+   :kid))
+
+(comment
+  (defn get-kid [token]
+    (-> token
+        (split #"\.")
+        first
+        crypto/decode-base64
+        bytes->string
+        (json/parse-string true)
+        :kid)))
 
 (defn validate-token [{:keys [keys]} token]
   (if-let [kid  (get-kid token)]
-    (d/chain
-     (keys/get-key keys kid)
-     #(if (nil? %1) (throw (Exception. (str "Unknown key: " kid))) %1)
-     #(jwt/unsign token (:key %1) (select-keys %1 [:alg]))
-     #(if (nil? %1) (throw (Exception. (str "Invalid key: " %1))) %1)
-     #(if (= kid (:iss %1)) %1 (throw (Exception. (str "KID(" kid ") did not match ISS(" (:iss %1) ")")))))
-    (d/error-deferred (Exception. "Invalid token"))
-    )
-  )
+    (d/let-flow [key (keys/get-key keys kid)]
+      (if (nil? key)
+        (throw (Exception. (str "Unknown key: " kid)))
+        (if-let [claims (jwt/unsign token (:key key) (select-keys key [:alg]))]
+          (if (= kid (:iss claims))
+            (if (or (= (:iss claims) (:sub claims))
+                    (:authoritative key))
+              claims
+              (throw (Exception. "Token not signed by authoritative key")))
+            (throw (Exception. (str "KID(" kid ") did not match ISS(" (:iss claims) ")"))))
+          (throw (Exception. "Invalid token")))))
+    (d/error-deferred (Exception. "Invalid token"))))
