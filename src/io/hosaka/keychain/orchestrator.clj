@@ -35,20 +35,21 @@
                   ))))
        "\n-----END PUBLIC KEY-----"))
 
+(defn sanitize-key [{:keys [kid] :as key}]
+  (assoc
+    (select-keys key [:kty :use :crv :x :y :alg :authoritative])
+    :kid (str kid)))
+
 (defn get-public-key [{:keys [keys]} kid]
   (d/chain
    (keys/get-key keys kid)
-   #(assoc
-     (select-keys %1 [:kty :use :crv :x :y :alg :authoritative])
-     :kid (-> %1 :kid str))))
+   sanitize-key
+
+   ))
 
 (defn get-authoritative-keys [{:keys [keys]}]
   (d/let-flow [keys (keys/get-authoritative-keys keys)]
-   (map
-    #(assoc
-      (select-keys %1 [:kty :use :crv :x :y :alg :authoritative])
-      :kid (-> %1 :kid str))
-    keys)))
+    (hash-map :keys (map sanitize-key keys))))
 
 (defn get-kid [jwt]
   (->

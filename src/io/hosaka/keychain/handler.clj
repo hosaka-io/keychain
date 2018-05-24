@@ -32,6 +32,14 @@
 
 (defn build-routes [orchestrator health]
   ["/" [
+        ["keys/"
+         (yada/resource {:methods
+                         {:get
+                          {:produces "application/json"
+                           :response (partial get-authoritative-keys orchestrator)}
+                          :post
+                          {:consumes "text/plain"
+                           :response (partial validate-token orchestrator)}}})]
         ["keys"
          (yada/resource {:methods
                          {:get
