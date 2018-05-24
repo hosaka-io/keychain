@@ -12,8 +12,6 @@
             )
   (:gen-class))
 
-(defonce system (atom {}))
-
 (defn init-system [env]
   (component/system-map
    :keys (new-keys)
@@ -22,6 +20,8 @@
    :db (new-database "keychain" env)
    :orchestrator (new-orchestrator)
    :server (new-server env)))
+
+(defonce system (atom {}))
 
 (defn -main [& args]
   (let [semaphore (d/deferred)]

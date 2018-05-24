@@ -8,3 +8,7 @@
   (d/future
     (get-key-sql (get-connection db) {:kid kid})))
 
+(defn get-authoritative-keys [db]
+  (d/future
+    (get-authoritative-keys-sql (get-connection db))))
+
