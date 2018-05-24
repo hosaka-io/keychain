@@ -5,7 +5,7 @@
             [manifold.deferred :as d]
             [cheshire.core :as json]
             [clj-crypto.core :as crypto]
-            [clojure.string :refer [split join]]
+            [clojure.string :refer [split join lower-case]]
             [com.stuartsierra.component :as component]))
 
 
@@ -38,12 +38,17 @@
 (defn get-public-key [{:keys [keys]} kid]
   (d/chain
    (keys/get-key keys kid)
-   key-to-pem))
+   #(assoc
+     (select-keys %1 [:kty :use :crv :x :y :alg :authoritative])
+     :kid (-> %1 :kid str))))
 
-(defn bytes->string [b]
-  (if b
-    (String. b)
-    nil))
+(defn get-authoritative-keys [{:keys [keys]}]
+  (d/let-flow [keys (keys/get-authoritative-keys keys)]
+   (map
+    #(assoc
+      (select-keys %1 [:kty :use :crv :x :y :alg :authoritative])
+      :kid (-> %1 :kid str))
+    keys)))
 
 (defn get-kid [jwt]
   (->
@@ -51,25 +56,15 @@
    decode-header
    :kid))
 
-(comment
-  (defn get-kid [token]
-    (-> token
-        (split #"\.")
-        first
-        crypto/decode-base64
-        bytes->string
-        (json/parse-string true)
-        :kid)))
-
 (defn validate-token [{:keys [keys]} token]
   (if-let [kid  (get-kid token)]
-    (d/let-flow [key (keys/get-key keys kid)]
+    (d/let-flow [{:keys [alg key authoritative]} (keys/get-key keys kid)]
       (if (nil? key)
         (throw (Exception. (str "Unknown key: " kid)))
-        (if-let [claims (jwt/unsign token (:key key) (select-keys key [:alg]))]
+        (if-let [claims (jwt/unsign token key {:alg (-> alg lower-case keyword)})]
           (if (= kid (:iss claims))
             (if (or (= (:iss claims) (:sub claims))
-                    (:authoritative key))
+                    authoritative)
               claims
               (throw (Exception. "Token not signed by authoritative key")))
             (throw (Exception. (str "KID(" kid ") did not match ISS(" (:iss claims) ")"))))

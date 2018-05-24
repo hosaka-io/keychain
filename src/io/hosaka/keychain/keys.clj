@@ -1,5 +1,6 @@
 (ns io.hosaka.keychain.keys
   (:require [clj-crypto.core :as crypto]
+            [buddy.core.keys :as jwk]
             [manifold.deferred :as d]
             [io.hosaka.keychain.db.keys :as db-keys]
             [com.stuartsierra.component :as component]))
@@ -18,19 +19,9 @@
    (map->Keys {})
    [:db]))
 
-(def size->alg {256 :es256 512 :es512})
-(defn get-alg [k]
-  (->> k
-       .getParameters
-       .getCurve
-       .getFieldSize
-       (get size->alg)))
-
 (defn decode-key [k]
-  (if-let [key (crypto/decode-public-key
-                (assoc (select-keys k [:algorithm])
-                       :bytes (crypto/decode-base64 (:key_data k))))]
-    (assoc k :key key :alg (get-alg key))
+  (if-let [key (jwk/jwk->public-key k)]
+    (assoc k :key key)
     nil))
 
 (defn get-key [keys kid]
@@ -48,6 +39,8 @@
          (if k (swap! (-> keys :keys) #(assoc % kid k)))
          k)))))
 
+(defn get-authoritative-keys [{:keys [db]}]
+  (db-keys/get-authoritative-keys db))
 
 (defn generate-key-pair []
   (let [k (crypto/generate-key-pair :key-size 256 :algorithm "ECDSA")

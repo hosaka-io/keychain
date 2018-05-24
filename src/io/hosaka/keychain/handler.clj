@@ -27,19 +27,30 @@
                (assoc response :body %1 :status 200)
                (assoc response :body %1 :status 503)))))
 
+(defn get-authoritative-keys [orchestrator ctx]
+  (orchestrator/get-authoritative-keys orchestrator))
+
 (defn build-routes [orchestrator health]
   ["/" [
-        ["keys/"
-         (yada/resource {:methods {:post {:consumes "text/plain"
-                                          :response (partial validate-token orchestrator)}}})]
+        ["keys"
+         (yada/resource {:methods
+                         {:get
+                          {:produces "application/json"
+                           :response (partial get-authoritative-keys orchestrator)}
+                          :post
+                          {:consumes "text/plain"
+                           :response (partial validate-token orchestrator)}}})]
         [["keys/" :kid]
          (yada/resource {:parameters {:path {:kid String}}
-                         :methods {
-                                   :get {:response (partial get-public-key orchestrator)
-                                         :produces "text/plain"}}})]
+                         :methods
+                         {:get
+                          {:response (partial get-public-key orchestrator)
+                           :produces "application/json"}}})]
         ["health"
-         (yada/resource {:methods {:get {:response (partial get-db-health health)
-                                         :produces "application/json"}}})]
+         (yada/resource {:methods
+                         {:get
+                          {:response (partial get-db-health health)
+                           :produces "application/json"}}})]
         ]])
 
 
