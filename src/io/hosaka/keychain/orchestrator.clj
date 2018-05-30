@@ -4,7 +4,6 @@
             [buddy.sign.jws :refer [decode-header]]
             [manifold.deferred :as d]
             [cheshire.core :as json]
-            [clj-crypto.core :as crypto]
             [clojure.string :refer [split join lower-case]]
             [com.stuartsierra.component :as component]))
 
@@ -23,17 +22,18 @@
    (map->Orchestrator {})
    [:keys :db]))
 
-(defn key-to-pem [{:keys [key_data]}]
-  (str "-----BEGIN PUBLIC KEY-----\n"
-       (join "\n"
-             (loop [data key_data lines []]
-               (if (>= 48 (count data))
-                 (conj lines data)
-                 (recur
-                  (subs data 48)
-                  (conj lines (subs data 0 48))
-                  ))))
-       "\n-----END PUBLIC KEY-----"))
+(comment 
+  (defn key-to-pem [{:keys [key_data]}]
+    (str "-----BEGIN PUBLIC KEY-----\n"
+         (join "\n"
+               (loop [data key_data lines []]
+                 (if (>= 48 (count data))
+                   (conj lines data)
+                   (recur
+                    (subs data 48)
+                    (conj lines (subs data 0 48))
+                    ))))
+         "\n-----END PUBLIC KEY-----")))
 
 (defn sanitize-key [{:keys [kid] :as key}]
   (assoc
