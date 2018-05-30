@@ -1,0 +1,7 @@
+{
+    "id" : "5a592d28-d38c-40b4-911d-c3c782002077",
+    "parent": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+    "name": "keychain",
+    "description": "Authentication Keys Service",
+    "entity_type": "service"
+}
