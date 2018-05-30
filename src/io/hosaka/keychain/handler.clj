@@ -28,14 +28,25 @@
 (defn add-key [orchestrator {:keys [body response request]}]
   (if-let [header (-> request :headers (get "authorization"))]
     (if-let [token (second (re-matches #"[Bb]earer: (.*)" header))]
-      (d/let-flow [{:keys [iss sub roles]} (orchestrator/validate-token orchestrator token)]
-        (if (and (not= iss sub)
-                 ((set roles) "DEITY"))
-          (do
-            (println "add key")
-            {:msg "Key added"}) 
-          (assoc response :body {:error "Invalid authorization token"} :status 403)
-          ))
+      (->
+       (d/let-flow [{:keys [iss sub roles]} (orchestrator/validate-token orchestrator token)]
+         (if (and (not= iss sub)
+                  ((set roles) "DEITY"))
+             (->
+              (orchestrator/add-key orchestrator body sub)
+              (d/chain (fn [c] {:msg "Key added"}))
+              (d/catch java.sql.SQLException
+                  (fn [e]
+                    (log/info "Error adding key" e)
+                    (assoc response :body {:error "Invalid request"} :status 400)))
+              (d/catch java.lang.AssertionError
+                  (fn [e]
+                    (log/info "Error adding key" e)
+                    (assoc response :body {:error "Invalid JWK"} :status 400))))
+           (assoc response :body {:error "Invalid authorization token"} :status 403)))
+       (d/catch (fn [e]
+                  (log/warn "Invalid token " e)
+                  (no-authorization-token response))))
       (no-authorization-token response))
     (no-authorization-token response)))
 
