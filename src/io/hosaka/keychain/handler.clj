@@ -19,14 +19,6 @@
                (log/warn (str "Invalid token: " msg))
                (assoc response :body msg :status 400 :headers {"content-type" "text/plain"})))))
 
-
-(defn get-db-health [health {:keys [response]}]
-  (->
-   (health/get-health health)
-   (d/chain #(if (= (:health %1) "HEALTHY")
-               (assoc response :body %1 :status 200)
-               (assoc response :body %1 :status 503)))))
-
 (defn get-authoritative-keys [orchestrator ctx]
   (orchestrator/get-authoritative-keys orchestrator))
 
@@ -57,7 +49,7 @@
         ["health"
          (yada/resource {:methods
                          {:get
-                          {:response (partial get-db-health health)
+                          {:response (partial health/get-health health)
                            :produces "application/json"}}})]
         ]])
 

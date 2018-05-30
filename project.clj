@@ -7,9 +7,8 @@
                            ["snapshots" "https://artifactory.i.hosaka.io/artifactory/libs-snapshot"]]
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [org.clojure/spec.alpha "0.1.143"]
 
-                 [io.hosaka/common "1.0.0"]
+                 [io.hosaka/common "1.1.3"]
                  [org.apache.logging.log4j/log4j-core "2.11.0"]
                  [org.apache.logging.log4j/log4j-api "2.11.0"]
                  [org.apache.logging.log4j/log4j-slf4j-impl "2.11.0"]
@@ -31,6 +30,7 @@
                  ]
   :uberjar-name "keychain.jar"
   :main ^:skip-aot io.hosaka.keychain
+  :jvm-opts ["-Xms128m" "-Xmx512m"]
   :target-path "target/%s"
   :source-paths ["src"]
   :profiles {:uberjar {:aot :all}
