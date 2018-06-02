@@ -17,7 +17,7 @@
    (d/chain #(assoc response :body (json/generate-string %) :status 200 :headers {"content-type" "application/json"}))
    (d/catch #(let [msg (.getMessage %)]
                (log/warn (str "Invalid token: " msg))
-               (assoc response :body msg :status 400 :headers {"content-type" "text/plain"})))))
+               (assoc response :body {:err true :msg msg} :status 400 :headers {"content-type" "application/json"})))))
 
 (defn get-authoritative-keys [orchestrator ctx]
   (orchestrator/get-authoritative-keys orchestrator))
