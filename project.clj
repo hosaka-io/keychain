@@ -8,7 +8,7 @@
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
 
-                 [io.hosaka/common "1.1.3"]
+                 [io.hosaka/common "1.1.5"]
                  [org.apache.logging.log4j/log4j-core "2.11.0"]
                  [org.apache.logging.log4j/log4j-api "2.11.0"]
                  [org.apache.logging.log4j/log4j-slf4j-impl "2.11.0"]
