@@ -3,6 +3,7 @@
             [com.stuartsierra.component :as component]
             [manifold.deferred :as d]
             [clojure.tools.logging :as log]
+            [clojure.tools.nrepl.server :as nrepl]
             [io.hosaka.keychain.handler :refer [new-handler]]
             [io.hosaka.keychain.keys :refer [new-keys]]
             [io.hosaka.keychain.orchestrator :refer [new-orchestrator]]
@@ -38,6 +39,7 @@
 
     (swap! system component/start)
     (reset! repl (if-let [nrepl-port (get-port (:nrepl-port env))] (nrepl/start-server :port nrepl-port) nil))
+
     (log/info "Keychain service booted")
     (deref semaphore)
     (log/info "keychain going down")

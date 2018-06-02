@@ -9,3 +9,7 @@ WHERE kid = CAST(:kid AS UUID)
 SELECT kid, authoritative, kty, crv, x, y, alg
   FROM keychain.keys
  WHERE authoritative
+
+-- :name add-key-sql :! :n
+INSERT INTO keychain.keys(kid, authoritative, kty, use, crv, x, y, alg, created_by)
+VALUES (CAST(:kid AS UUID), :authoritative, :kty, :use, :crv, :x, :y, :alg, CAST(:created_by AS UUID))
