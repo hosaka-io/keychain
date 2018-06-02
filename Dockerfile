@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:8-jre-alpine
 COPY ./target/uberjar/keychain.jar /srv/keychain.jar
 WORKDIR /srv
 

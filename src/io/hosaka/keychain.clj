@@ -21,17 +21,28 @@
    :orchestrator (new-orchestrator)
    :server (new-server env)))
 
+(defn get-port [port]
+  (cond
+    (string? port) (try (Integer/parseInt port)
+                        (catch Exception e nil))
+    (integer? port) port
+    :else nil))
+
 (defonce system (atom {}))
+
+(defonce repl (atom nil))
 
 (defn -main [& args]
   (let [semaphore (d/deferred)]
     (reset! system (init-system env))
 
     (swap! system component/start)
+    (reset! repl (if-let [nrepl-port (get-port (:nrepl-port env))] (nrepl/start-server :port nrepl-port) nil))
     (log/info "Keychain service booted")
     (deref semaphore)
     (log/info "keychain going down")
     (component/stop @system)
+    (swap! repl (fn [server] (do (if server (nrepl/stop-server server)) nil)))
 
     (shutdown-agents)
     ))
