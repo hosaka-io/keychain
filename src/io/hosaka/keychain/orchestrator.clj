@@ -5,6 +5,7 @@
             [buddy.sign.jws :refer [decode-header]]
             [manifold.deferred :as d]
             [cheshire.core :as json]
+            [clojure.tools.logging :as log]
             [clojure.string :refer [split join lower-case]]
             [com.stuartsierra.component :as component]))
 
@@ -61,7 +62,10 @@
 (defn unsign [& args]
   (try
     (apply jwt/unsign args)
-    (catch Exception e nil)))
+    (catch Exception e
+      (do
+        (log/info e "Invalid token")
+        nil))))
 
 (defn validate-token [{:keys [keys]} token]
   (if-let [kid  (get-kid token)]
@@ -76,7 +80,9 @@
               (throw (Exception. "Token not signed by authoritative key")))
             (throw (Exception. (str "KID(" kid ") did not match ISS(" (:iss claims) ")"))))
           (throw (Exception. "Invalid token")))))
-    (d/error-deferred (Exception. "Invalid token"))))
+    (do
+      (log/info "Malformed token")
+      (d/error-deferred (Exception. "Invalid token")))))
 
 (defn add-key [{:keys [db]} jwk user]
   (try
