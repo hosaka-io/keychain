@@ -20,8 +20,10 @@
    [:db]))
 
 (defn decode-key [k]
-  (if-let [key (jwk/jwk->public-key k)]
-    (assoc k :key key)
+  (if k
+    (if-let [key (jwk/jwk->public-key k)]
+      (assoc k :key key)
+      nil)
     nil))
 
 (defn get-key [keys kid]
