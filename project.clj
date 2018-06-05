@@ -1,6 +1,6 @@
 (defproject io.hosaka/keychain "0.1.0"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "Authentication Keys Service"
+  :url "https://github.com/hosaka-io/keychain"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :repositories ^:replace [["releases" "https://artifactory.i.hosaka.io/artifactory/libs-release"]
@@ -8,7 +8,7 @@
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
 
-                 [io.hosaka/common "1.1.5"]
+                 [io.hosaka/common "1.2.1"]
                  [org.apache.logging.log4j/log4j-core "2.11.0"]
                  [org.apache.logging.log4j/log4j-api "2.11.0"]
                  [org.apache.logging.log4j/log4j-slf4j-impl "2.11.0"]
