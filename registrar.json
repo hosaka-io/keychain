@@ -4,4 +4,6 @@
     "name": "keychain",
     "description": "Authentication Keys Service",
     "entity_type": "service"
+    "image": "registry.i.hosaka.io/keychain"
+    "git-url": "https://github.com/hosaka-io/keychain"
 }

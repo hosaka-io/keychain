@@ -1,6 +1,7 @@
 (ns io.hosaka.keychain.orchestrator
   (:require [io.hosaka.keychain.keys :as keys]
             [io.hosaka.keychain.db.keys :as db-keys]
+            [io.hosaka.keychain.keys :refer [generate-key-pair]]
             [buddy.sign.jwt :as jwt]
             [buddy.sign.jws :refer [decode-header]]
             [manifold.deferred :as d]
@@ -88,3 +89,11 @@
   (try
     (db-keys/add-key db jwk user)
     (catch AssertionError e (d/error-deferred e))))
+
+(defn create-key [orchestrator id user]
+  (let [{:keys [public-key private-key]} (generate-key-pair)]
+    (d/chain
+     (add-key orchestrator (assoc public-key :kid id) user)
+     (fn [_] private-key))))
+
+

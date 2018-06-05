@@ -47,6 +47,6 @@
 (defn generate-key-pair []
   (let [k (crypto/generate-key-pair :key-size 256 :algorithm "ECDSA")
         kpm (crypto/get-key-pair-map k)]
-    {:private-key (crypto/encode-base64-as-str (-> kpm :private-key :bytes))
-     :public-key  (crypto/encode-base64-as-str (-> kpm :public-key  :bytes))}))
+    {:private-key (-> kpm :private-key :bytes crypto/encode-base64-as-str)
+     :public-key (-> k .getPublic jwk/public-key->jwk (assoc :use "sig" :alg "ES256"))}))
 
